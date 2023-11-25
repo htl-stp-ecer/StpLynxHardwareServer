@@ -65,6 +65,7 @@ build CMakeFiles/StpLynxHardwareServer.dir/main.cpp.o: CXX_COMPILER__StpLynxHard
 
 build StpLynxHardwareServer: CXX_EXECUTABLE_LINKER__StpLynxHardwareServer_Debug CMakeFiles/StpLynxHardwareServer.dir/main.cpp.o
   FLAGS = -g
+  LINK_LIBRARIES = -ldl
   OBJECT_DIR = CMakeFiles/StpLynxHardwareServer.dir
   POST_BUILD = :
   PRE_LINK = :
