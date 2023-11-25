@@ -16,8 +16,8 @@ void add_value_route(httplib::Server &svr, const char *route, signed short (*val
     });
 }
 
-void add_digital_value_route(httplib::Server &svr, const char *route, int (*digital_value_function)(int)) {
-    svr.Get(route, [digital_value_function](const httplib::Request &req, httplib::Response &res) {
+void add_port_value_route(httplib::Server &svr, const char *route, int (*value_function)(int)) {
+    svr.Get(route, [value_function](const httplib::Request &req, httplib::Response &res) {
         try {
             auto json_body = json::parse(req.body);
             if (json_body.find("port") == json_body.end())
@@ -25,7 +25,7 @@ void add_digital_value_route(httplib::Server &svr, const char *route, int (*digi
 
             int port = json_body["port"];
             json data;
-            data["value"] = digital_value_function(port);
+            data["value"] = value_function(port);
             res.set_content(data.dump(), "application/json");
         } catch (...) {
             res.status = 400;
@@ -56,7 +56,8 @@ int main() {
     add_value_route(svr, "/accel_y", (signed short (*)()) dlsym(lib_handle, "accel_y"));
     add_value_route(svr, "/accel_z", (signed short (*)()) dlsym(lib_handle, "accel_z"));
 
-    add_digital_value_route(svr, "/get_digital_value", (int (*)(int)) dlsym(lib_handle, "get_digital_value"));
+    add_port_value_route(svr, "/digital", (int (*)(int)) dlsym(lib_handle, "digital"));
+    add_port_value_route(svr, "/analog", (int (*)(int)) dlsym(lib_handle, "analog"));
 
     svr.listen("0.0.0.0", PORT);
     dlclose(lib_handle);
