@@ -19,17 +19,17 @@ void add_value_route(httplib::Server &svr, const char *route, signed short (*val
 void add_port_value_route(httplib::Server &svr, const char *route, int (*value_function)(int)) {
     svr.Get(route, [value_function](const httplib::Request &req, httplib::Response &res) {
         try {
-            auto json_body = json::parse(req.body);
-            if (json_body.find("port") == json_body.end())
+            auto port_str = req.get_param_value("port");
+            if (port_str.empty())
                 throw std::runtime_error("Missing port");
 
-            int port = json_body["port"];
+            int port = std::stoi(port_str);
             json data;
             data["value"] = value_function(port);
             res.set_content(data.dump(), "application/json");
         } catch (...) {
             res.status = 400;
-            res.set_content("Bad Request: Invalid JSON payload", "text/plain");
+            res.set_content("Bad Request: Invalid or missing 'port' query parameter", "text/plain");
         }
     });
 }
