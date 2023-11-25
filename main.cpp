@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include "httplib.h"
 
-#define PORT 3030
+#define PORT 3031
 
 void gyro_x(httplib::Server &svr, void *lib_handle) {
     auto (*gyro_x)() = (signed short (*)()) dlsym(lib_handle, "gyro_x");
@@ -20,18 +20,18 @@ void gyro_x(httplib::Server &svr, void *lib_handle) {
 }
 
 int main() {
+    using namespace httplib;
     void *lib_handle = dlopen("/usr/lib/libkipr.so", RTLD_LAZY);
     if (!lib_handle) {
         fprintf(stderr, "Error loading libkipr.so: %s\n", dlerror());
         exit(EXIT_FAILURE);
     }
 
-    httplib::Server svr;
+    Server svr;
 
     gyro_x(svr, lib_handle);
 
-    svr.listen("localhost", PORT);
 
+    svr.listen("localhost", PORT);
     dlclose(lib_handle);
-    return 0;
 }

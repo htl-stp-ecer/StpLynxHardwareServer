@@ -5736,6 +5736,7 @@ static WSInit wsinit_;
 
     inline bool Server::listen(const std::string &host, int port,
                                int socket_flags) {
+        std::cout << "listing to port " << port << std::endl;
         auto se = detail::scope_exit([&]() { done_ = true; });
         return bind_to_port(host, port, socket_flags) && listen_internal();
     }

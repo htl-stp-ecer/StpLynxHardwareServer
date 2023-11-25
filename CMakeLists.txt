@@ -3,7 +3,7 @@ project(StpLynxHardwareServer)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(StpLynxHardwareServer main.cpp
-        headers/gyro.h
-        httplib.h)
-target_link_libraries(StpLynxHardwareServer dl)
+add_executable(StpLynxHardwareServer main.cpp httplib.h)
+
+find_package(Threads REQUIRED)
+target_link_libraries(StpLynxHardwareServer dl Threads::Threads)
