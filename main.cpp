@@ -2,20 +2,17 @@
 #include <cstdio>
 #include <cstdlib>
 #include "httplib.h"
+#include "json.hpp"
 
-#define PORT 3031
+#define PORT 3030
 
-void gyro_x(httplib::Server &svr, void *lib_handle) {
-    auto (*gyro_x)() = (signed short (*)()) dlsym(lib_handle, "gyro_x");
-    if (!gyro_x) {
-        fprintf(stderr, "Error getting gyro_x function: %s\n", dlerror());
-        dlclose(lib_handle);
-        exit(EXIT_FAILURE);
-    }
+using json = nlohmann::json;
 
-    svr.Get("/gyro_x", [gyro_x](const httplib::Request &req, httplib::Response &res) {
-        signed short gyro_x_result = gyro_x();
-        res.set_content(std::to_string(gyro_x_result), "text/plain");
+void add_value_route(httplib::Server &svr, const char *route, signed short (*value_function)()) {
+    svr.Get(route, [value_function](const httplib::Request &req, httplib::Response &res) {
+        json data;
+        data["value"] = value_function();
+        res.set_content(data.dump(), "application/json");
     });
 }
 
@@ -29,9 +26,15 @@ int main() {
 
     Server svr;
 
-    gyro_x(svr, lib_handle);
+    add_value_route(svr, "/gyro_x", (signed short (*)()) dlsym(lib_handle, "gyro_x"));
+    add_value_route(svr, "/gyro_y", (signed short (*)()) dlsym(lib_handle, "gyro_y"));
+    add_value_route(svr, "/gyro_z", (signed short (*)()) dlsym(lib_handle, "gyro_z"));
+
+    add_value_route(svr, "/magneto_x", (signed short (*)()) dlsym(lib_handle, "magneto_x"));
+    add_value_route(svr, "/magneto_y", (signed short (*)()) dlsym(lib_handle, "magneto_y"));
+    add_value_route(svr, "/magneto_z", (signed short (*)()) dlsym(lib_handle, "magneto_z"));
 
 
-    svr.listen("localhost", PORT);
+    svr.listen("0.0.0.0", PORT);
     dlclose(lib_handle);
 }
