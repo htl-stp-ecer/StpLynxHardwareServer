@@ -51,7 +51,7 @@ build cmake_object_order_depends_target_StpLynxHardwareServer: phony || CMakeFil
 
 build CMakeFiles/StpLynxHardwareServer.dir/main.cpp.o: CXX_COMPILER__StpLynxHardwareServer_unscanned_Debug /media/tobias/Data/Development/ECER/StpLynxHardwareServer/main.cpp || cmake_object_order_depends_target_StpLynxHardwareServer
   DEP_FILE = CMakeFiles/StpLynxHardwareServer.dir/main.cpp.o.d
-  FLAGS = -g -fdiagnostics-color=always
+  FLAGS = -g -std=gnu++17 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles/StpLynxHardwareServer.dir
   OBJECT_FILE_DIR = CMakeFiles/StpLynxHardwareServer.dir
 
