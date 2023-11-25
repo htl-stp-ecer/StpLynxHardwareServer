@@ -8,10 +8,16 @@
 
 using json = nlohmann::json;
 
+void observationTime(json &data) {
+    data["observationTime"] = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
+}
+
 void add_value_route(httplib::Server &svr, const char *route, signed short (*value_function)()) {
     svr.Get(route, [value_function](const httplib::Request &req, httplib::Response &res) {
         json data;
         data["value"] = value_function();
+        observationTime(data);
         res.set_content(data.dump(), "application/json");
     });
 }
@@ -26,6 +32,7 @@ void add_port_value_route(httplib::Server &svr, const char *route, int (*value_f
             int port = std::stoi(port_str);
             json data;
             data["value"] = value_function(port);
+            observationTime(data);
             res.set_content(data.dump(), "application/json");
         } catch (...) {
             res.status = 400;
