@@ -17,6 +17,7 @@ void cors(httplib::Response &res) {
     res.set_header("Access-Control-Allow-Origin", "http://localhost:3000");
     res.set_header("Access-Control-Allow-Methods", "GET");
     res.set_header("Access-Control-Allow-Headers", "Content-Type");
+    res.set_content("Access-Control-Allow-Credentials", "true");
 }
 
 void add_value_route(httplib::Server &svr, const char *route, signed short (*value_function)()) {
