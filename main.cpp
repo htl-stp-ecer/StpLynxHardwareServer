@@ -14,7 +14,7 @@ void observationTime(json &data) {
 }
 
 void cors(httplib::Response &res) {
-    res.set_header("Access-Control-Allow-Origin", "localhost:3000");
+    res.set_header("Access-Control-Allow-Origin", "http://localhost:3000");
     res.set_header("Access-Control-Allow-Methods", "GET");
     res.set_header("Access-Control-Allow-Headers", "Content-Type");
 }
