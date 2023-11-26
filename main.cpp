@@ -15,7 +15,7 @@ void observationTime(json &data) {
 
 void cors(httplib::Response &res) {
     res.set_header("Access-Control-Allow-Origin", "http://localhost:3000");
-    res.set_content("Access-Control-Allow-Credentials", "true");
+    res.set_header("Access-Control-Allow-Credentials", "true");
 }
 
 void add_value_route(httplib::Server &svr, const char *route, signed short (*value_function)()) {
