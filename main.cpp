@@ -13,11 +13,18 @@ void observationTime(json &data) {
             std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
+void cors(httplib::Response &res) {
+    res.set_header("Access-Control-Allow-Origin", "localhost:3000");
+    res.set_header("Access-Control-Allow-Methods", "GET");
+    res.set_header("Access-Control-Allow-Headers", "Content-Type");
+}
+
 void add_value_route(httplib::Server &svr, const char *route, signed short (*value_function)()) {
     svr.Get(route, [value_function](const httplib::Request &req, httplib::Response &res) {
         json data;
         data["value"] = value_function();
         observationTime(data);
+        cors(res);
         res.set_content(data.dump(), "application/json");
     });
 }
@@ -33,6 +40,7 @@ void add_port_value_route(httplib::Server &svr, const char *route, int (*value_f
             json data;
             data["value"] = value_function(port);
             observationTime(data);
+            cors(res);
             res.set_content(data.dump(), "application/json");
         } catch (...) {
             res.status = 400;
