@@ -29,6 +29,16 @@ void add_value_route(httplib::Server &svr, const char *route, signed short (*val
     });
 }
 
+void add_value_route(httplib::Server &svr, const char *route, float (*value_function)()) {
+    svr.Get(route, [value_function](const httplib::Request &req, httplib::Response &res) {
+        json data;
+        data["value"] = value_function();
+        observationTime(data);
+        cors(res);
+        res.set_content(data.dump(), "application/json");
+    });
+}
+
 void add_port_value_route(httplib::Server &svr, const char *route, int (*value_function)(int)) {
     svr.Get(route, [value_function](const httplib::Request &req, httplib::Response &res) {
         try {
@@ -70,7 +80,7 @@ int main() {
     add_value_route(svr, "/accel_x", (signed short (*)()) dlsym(lib_handle, "accel_x"));
     add_value_route(svr, "/accel_y", (signed short (*)()) dlsym(lib_handle, "accel_y"));
     add_value_route(svr, "/accel_z", (signed short (*)()) dlsym(lib_handle, "accel_z"));
-    add_value_route(svr, "/power_level", (signed short (*)()) dlsym(lib_handle, "power_level"));
+    add_value_route(svr, "/power_level", (float (*)()) dlsym(lib_handle, "power_level"));
 
     add_port_value_route(svr, "/digital", (int (*)(int)) dlsym(lib_handle, "digital"));
     add_port_value_route(svr, "/analog", (int (*)(int)) dlsym(lib_handle, "analog"));
