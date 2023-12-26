@@ -18,6 +18,7 @@ void cors(httplib::Response &res) {
     res.set_header("Access-Control-Allow-Credentials", "true");
 }
 
+
 void add_value_route(httplib::Server &svr, const char *route, signed short (*value_function)()) {
     svr.Get(route, [value_function](const httplib::Request &req, httplib::Response &res) {
         json data;
@@ -69,6 +70,7 @@ int main() {
     add_value_route(svr, "/accel_x", (signed short (*)()) dlsym(lib_handle, "accel_x"));
     add_value_route(svr, "/accel_y", (signed short (*)()) dlsym(lib_handle, "accel_y"));
     add_value_route(svr, "/accel_z", (signed short (*)()) dlsym(lib_handle, "accel_z"));
+    add_value_route(svr, "/power_level", (signed short (*)()) dlsym(lib_handle, "power_level"));
 
     add_port_value_route(svr, "/digital", (int (*)(int)) dlsym(lib_handle, "digital"));
     add_port_value_route(svr, "/analog", (int (*)(int)) dlsym(lib_handle, "analog"));
