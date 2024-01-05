@@ -68,6 +68,7 @@ void method_call_port_route(httplib::Server &svr, const char *route, void (*meth
 
             int port = std::stoi(port_str);
             method(port);
+            cors(res);
             res.status = 204;
         } catch (...) {
             res.status = 400;
@@ -90,6 +91,7 @@ void method_call_port_value_route(httplib::Server &svr, const char *route, void 
             int port = std::stoi(port_str);
             int value = std::stoi(value_str);
             method(port, value);
+            cors(res);
             res.status = 204;
         } catch (...) {
             res.status = 400;
