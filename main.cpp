@@ -59,6 +59,45 @@ void add_port_value_route(httplib::Server &svr, const char *route, int (*value_f
     });
 }
 
+void method_call_port_route(httplib::Server &svr, const char *route, void (*method)(int)) {
+    svr.Post(route, [method](const httplib::Request &req, httplib::Response &res) {
+        try {
+            auto port_str = req.get_param_value("port");
+            if (port_str.empty())
+                throw std::runtime_error("Missing port");
+
+            int port = std::stoi(port_str);
+            method(port);
+            res.status = 204;
+        } catch (...) {
+            res.status = 400;
+            res.set_content("Bad Request: Invalid or missing 'port' query parameter", "text/plain");
+        }
+    });
+}
+
+void method_call_port_value_route(httplib::Server &svr, const char *route, void (*method)(int, int)) {
+    svr.Post(route, [method](const httplib::Request &req, httplib::Response &res) {
+        try {
+            auto port_str = req.get_param_value("port");
+            if (port_str.empty())
+                throw std::runtime_error("Missing port");
+
+            auto value_str = req.get_param_value("value");
+            if (value_str.empty())
+                throw std::runtime_error("Missing value");
+
+            int port = std::stoi(port_str);
+            int value = std::stoi(value_str);
+            method(port, value);
+            res.status = 204;
+        } catch (...) {
+            res.status = 400;
+            res.set_content("Bad Request: Invalid or missing 'port' or 'value' query parameter", "text/plain");
+        }
+    });
+}
+
 int main() {
     using namespace httplib;
     void *lib_handle = dlopen("/usr/lib/libkipr.so", RTLD_LAZY);
@@ -84,6 +123,15 @@ int main() {
 
     add_port_value_route(svr, "/digital", (int (*)(int)) dlsym(lib_handle, "digital"));
     add_port_value_route(svr, "/analog", (int (*)(int)) dlsym(lib_handle, "analog"));
+
+    add_port_value_route(svr, "/motor/position", (int (*)(int)) dlsym(lib_handle, "get_motor_position_counter"));
+    method_call_port_route(svr, "/motor/off", (void (*)(int)) dlsym(lib_handle, "off"));
+    method_call_port_value_route(svr, "/motor/velocity", (void (*)(int, int)) dlsym(lib_handle, "move_at_velocity"));
+
+    add_port_value_route(svr, "/servo/position", (int (*)(int)) dlsym(lib_handle, "get_servo_position"));
+    method_call_port_value_route(svr, "/servo/position", (void (*)(int, int)) dlsym(lib_handle, "set_servo_position"));
+    method_call_port_route(svr, "/servo/off", (void (*)(int)) dlsym(lib_handle, "disable_servo"));
+    method_call_port_route(svr, "/servo/on", (void (*)(int)) dlsym(lib_handle, "enable_servo"));
 
     svr.listen("0.0.0.0", PORT);
     dlclose(lib_handle);
